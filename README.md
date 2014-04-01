@@ -4,11 +4,11 @@ Android app that allows the user to view their Twitter Timeline with infinite sc
 and post new Tweets.
 
 View of the Users Timeline.
-![Timeline view](/screens/timeline_view.png?raw=true)
+![Timeline view](/screens/timeline_view_rename.png?raw=true)
 
 The user can compose a new tweet.
-![Compose Tweet](/screens/timeline_view.png?raw=true)
+![Compose Tweet](/screens/timeline_view_rename.png?raw=true)
 
 After posting a tweet it becomes the first tweet in the timeline.
-![Posted Tweet](/screens/timeline_view.png?raw=true)
+![Posted Tweet](/screens/timeline_view_rename.png?raw=true)
 
