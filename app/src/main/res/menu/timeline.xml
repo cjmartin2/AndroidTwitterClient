@@ -10,4 +10,13 @@
         android:onClick="onCompose"
         android:title="@string/compose_tweet">
     </item>
+
+    <item
+        android:id="@+id/miRefresh"
+        android:orderInCategory="1"
+        android:icon="@drawable/ic_refresh"
+        android:showAsAction="ifRoom"
+        android:onClick="onRefresh"
+        android:title="@string/refresh">
+    </item>
 </menu>

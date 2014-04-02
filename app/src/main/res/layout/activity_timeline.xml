@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/lvTweets"
-        android:divider="#ffcce0fa"
+        android:divider="#ffb3d2fa"
         android:dividerHeight="1dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"

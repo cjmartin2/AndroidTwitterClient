@@ -8,5 +8,8 @@
     <string name="login_label">Log in</string>
     <string name="title_activity_timeline">TimelineActivity</string>
     <string name="compose_tweet">Compose Tweet</string>
+    <string name="tweet">Tweet</string>
+    <string name="cancel">Cancel</string>
+    <string name="refresh">Refresh</string>
 
 </resources>

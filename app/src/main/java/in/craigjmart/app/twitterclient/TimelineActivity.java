@@ -35,7 +35,7 @@ public class TimelineActivity extends Activity {
         lvTweets = (ListView) findViewById(R.id.lvTweets);
 
         getProfile();
-        buildTimeline(-1);
+        buildTimeline(-1, false);
 
         lvTweets.setOnScrollListener(new EndlessScrollListener() {
             @Override
@@ -45,7 +45,7 @@ public class TimelineActivity extends Activity {
         });
     }
 
-    private void buildTimeline(final long lastTweetId) {
+    private void buildTimeline(final long lastTweetId, final boolean isRefresh) {
         CraigTwitterApp.getRestClient().getHomeTimeline(lastTweetId, new JsonHttpResponseHandler() {
 
             @Override
@@ -58,15 +58,39 @@ public class TimelineActivity extends Activity {
                     adapter = new TweetAdapter(getBaseContext(), tweets);
                     lvTweets.setAdapter(adapter);
                 } else {
-                    adapter.addAll(tweets);
+                    if (isRefresh){
+                        //find the id of the top tweet, and only append newer ones (I'm sure there is an API call designed for this)
+                        long topTweet = adapter.getItem(0).getId();
+                        long newTweet = 0;
+                        for (int i = 0; i < tweets.size(); i++) {
+                            newTweet = tweets.get(i).getId();
+                            Log.d("tweet", String.valueOf(newTweet));
+                            if(newTweet > topTweet){
+                                //assuming the tweets are in order, coming from twitter, then we are putting
+                                //them in the same order at the top of the array adapter
+                                adapter.insert(tweets.get(i), i);
+                            }
+                        }
+                    }else {
+                        adapter.addAll(tweets);
+                    }
                 }
             }
         });
     }
 
+    public void onRefresh(MenuItem miRefresh) {
+        //get fresh list of tweets
+
+        //in theory I should be inserting these instead of just building new
+        TweetAdapter adapter = (TweetAdapter)lvTweets.getAdapter();
+        Log.d("tweet", String.valueOf(adapter.getItem(0).getId()));
+        buildTimeline(-1, true);
+    }
+
     public void onRequestMore() {
         //need to subtract 1 here to get 2nd last, otherwise we get a dupe
-        buildTimeline(getLastTweetId() - 1);
+        buildTimeline(getLastTweetId() - 1, false);
     }
 
     public long getLastTweetId() {
