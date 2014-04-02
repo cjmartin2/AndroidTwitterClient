@@ -16,5 +16,5 @@ Hitting the refresh button will add individual new tweets to the top of the stre
 keeping the full list of tweets you have already requested.
 ![Posted Tweet](/screens/timeline_refresh_small.png?raw=true)
 
-Pull to refresh to get new updates.
+New: Pull to refresh to get new updates.
 ![Posted Tweet](/screens/pull_refresh_small.png?raw=true)
