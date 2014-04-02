@@ -3,10 +3,11 @@ package in.craigjmart.app.twitterclient;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -18,6 +19,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import in.craigjmart.app.twitterclient.models.Tweet;
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 
 public class TimelineActivity extends Activity {
@@ -25,6 +29,7 @@ public class TimelineActivity extends Activity {
     private static final int COMPOSE_REQUEST = 123;
     private String user_id = "";
     private ListView lvTweets;
+    private PullToRefreshLayout ptrLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +38,11 @@ public class TimelineActivity extends Activity {
 
         user_id = getIntent().getStringExtra(USER_ID);
         lvTweets = (ListView) findViewById(R.id.lvTweets);
+
+        // Now find the PullToRefreshLayout to setup
+        ptrLayout = (PullToRefreshLayout) findViewById(R.id.ptrLayout);
+        // Now setup the PullToRefreshLayout
+        setupPullToRefresh();
 
         getProfile();
         buildTimeline(-1, false);
@@ -58,20 +68,34 @@ public class TimelineActivity extends Activity {
                     adapter = new TweetAdapter(getBaseContext(), tweets);
                     lvTweets.setAdapter(adapter);
                 } else {
-                    if (isRefresh){
+                    if (isRefresh) {
                         //find the id of the top tweet, and only append newer ones (I'm sure there is an API call designed for this)
                         long topTweet = adapter.getItem(0).getId();
                         long newTweet = 0;
+                        boolean invalidate = false;
                         for (int i = 0; i < tweets.size(); i++) {
                             newTweet = tweets.get(i).getId();
-                            Log.d("tweet", String.valueOf(newTweet));
-                            if(newTweet > topTweet){
+//                            Log.d("tweet", String.valueOf(newTweet));
+                            if (newTweet > topTweet) {
                                 //assuming the tweets are in order, coming from twitter, then we are putting
                                 //them in the same order at the top of the array adapter
                                 adapter.insert(tweets.get(i), i);
+                                invalidate = true;
                             }
                         }
-                    }else {
+                        if(invalidate) {
+                            //this does not seem to work, after refresh, user has to still scroll the view to get new update
+                            final TweetAdapter finalAdapter = adapter;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    finalAdapter.notifyDataSetChanged();
+//                            adapter.notifyAll();
+//                            adapter.notify();
+                                }
+                            });
+                        }
+                    } else {
                         adapter.addAll(tweets);
                     }
                 }
@@ -79,13 +103,15 @@ public class TimelineActivity extends Activity {
         });
     }
 
-    public void onRefresh(MenuItem miRefresh) {
+    public void doRefresh() {
         //get fresh list of tweets
-
-        //in theory I should be inserting these instead of just building new
         TweetAdapter adapter = (TweetAdapter)lvTweets.getAdapter();
-        Log.d("tweet", String.valueOf(adapter.getItem(0).getId()));
+//        Log.d("tweet", String.valueOf(adapter.getItem(0).getId()));
         buildTimeline(-1, true);
+    }
+
+    public void onRefresh(MenuItem miRefresh) {
+        doRefresh(); //
     }
 
     public void onRequestMore() {
@@ -130,8 +156,8 @@ public class TimelineActivity extends Activity {
                 try {
 //                    Log.d("DIGGING", jsonUser.toString());
                     String screen_name = (String)jsonUser.get("screen_name");
-                    Log.d("DIGGING", screen_name);
-                    Log.d("DIGGING", (String)jsonUser.get("profile_image_url"));
+//                    Log.d("DIGGING", screen_name);
+//                    Log.d("DIGGING", (String)jsonUser.get("profile_image_url"));
                     ActionBar ab = getActionBar();
                     ab.setTitle("@" + screen_name);
                 } catch (JSONException e) {
@@ -146,5 +172,43 @@ public class TimelineActivity extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.timeline, menu);
         return true;
+    }
+
+
+
+    private void setupPullToRefresh() {
+        ActionBarPullToRefresh.from(this)
+            // Mark All Children as pullable
+            .allChildrenArePullable()
+                    // Set a OnRefreshListener
+            .listener(new OnRefreshListener() {
+                @Override
+                public void onRefreshStarted(View view) {
+                    new AsyncTask<Void, Void, Void>() {
+
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            try {
+                                //this is honestly just so there is some animation so the user isn't confused
+                                Thread.sleep(500);
+                                doRefresh();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Void result) {
+                            super.onPostExecute(result);
+
+                            // Notify PullToRefreshLayout that the refresh has finished
+                            ptrLayout.setRefreshComplete();
+                        }
+                    }.execute();
+                }
+            })
+                    // Finally commit the setup to our PullToRefreshLayout
+            .setup(ptrLayout);
     }
 }

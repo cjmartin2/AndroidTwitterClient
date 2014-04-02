@@ -44,7 +44,7 @@ public class Tweet extends BaseModel {
             //I am clearly not doing this right, as I am turning the correct date into Jan 01, 2014.  Can't waste anymore time
             //blah, nevermind . . . I think I had capital HH which broke it
 //            Log.d("DATE", dateString);
-            Date d = new SimpleDateFormat("EEE MMM dd hh:mm:ss Z yyyy", Locale.ENGLISH).parse(dateString);
+            Date d = new SimpleDateFormat("EEE MMM dd hh:mm:ss ZZZZZ yyyy", Locale.ENGLISH).parse(dateString);
 //            Log.d("DATE", d.toString());
 
             long timeAt = d.getTime();
