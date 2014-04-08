@@ -1,18 +1,16 @@
-<uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TimelineActivity"
-    android:id="@+id/ptrLayout">
+    tools:context=".TimelineActivity">
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/lvTweets"
-        android:divider="#ffb3d2fa"
-        android:dividerHeight="1dp"
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-</uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>
+        android:layout_alignParentStart="true"
+        android:id="@+id/frame_container"></FrameLayout>
+</RelativeLayout>

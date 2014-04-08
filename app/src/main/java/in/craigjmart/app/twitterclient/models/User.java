@@ -1,52 +1,44 @@
 package in.craigjmart.app.twitterclient.models;
 
+import com.activeandroid.Model;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
  * Created by admin on 4/1/14.
  */
-public class User extends BaseModel {
-    public String getName() {
-        return getString("name");
+public class User extends Model {
+    private String name;
+    private String screenName;
+    private String profileImageUrl;
+
+    public User(JSONObject jsonObject) throws JSONException{
+        super();
+        name = jsonObject.getString("name");
+        screenName = jsonObject.getString("screen_name");
+        profileImageUrl = jsonObject.getString("profile_image_url");
     }
 
-    public long getId() {
-        return getLong("id");
+    public String getName() {
+        return name;
     }
 
     public String getScreenName() {
-        return getString("screen_name");
+        return screenName;
     }
 
     public String getProfileImageUrl() {
-        return getString("profile_image_url");
+        return profileImageUrl;
     }
 
-    public String getProfileBackgroundImageUrl() {
-        return getString("profile_background_image_url");
-    }
-
-    public int getNumTweets() {
-        return getInt("statuses_count");
-    }
-
-    public int getFollowersCount() {
-        return getInt("followers_count");
-    }
-
-    public int getFriendsCount() {
-        return getInt("friends_count");
-    }
-
-    public static User fromJson(JSONObject json) {
-        User u = new User();
-
+    public static User fromJson(JSONObject jsonObject) {
         try {
-            u.jsonObject = json;
+            User u = new User(jsonObject);
+            return u;
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-
-        return u;
     }
 }

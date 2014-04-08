@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/miCompose"
-        android:orderInCategory="10"
+        android:orderInCategory="1"
         android:icon="@drawable/ic_compose"
         android:showAsAction="ifRoom"
         android:onClick="onCompose"
@@ -12,11 +12,10 @@
     </item>
 
     <item
-        android:id="@+id/miRefresh"
-        android:orderInCategory="1"
-        android:icon="@drawable/ic_refresh"
+        android:id="@+id/miProfile"
+        android:orderInCategory="10"
+        android:icon="@drawable/ic_profile"
         android:showAsAction="ifRoom"
-        android:onClick="doRefresh"
-        android:title="@string/refresh">
+        android:title="@string/profile">
     </item>
 </menu>

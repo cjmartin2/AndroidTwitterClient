@@ -1,5 +1,7 @@
 package in.craigjmart.app.twitterclient.models;
 
+import com.activeandroid.Model;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,33 +15,40 @@ import java.util.Locale;
 /**
  * Created by admin on 4/1/14.
  */
-public class Tweet extends BaseModel {
+public class Tweet extends Model {
     private User user;
+    private String body;
+    private long id;
+    private String createdAt;
+
+    public Tweet(JSONObject jsonObject) throws JSONException {
+        super();
+        user = User.fromJson(jsonObject.getJSONObject("user"));
+        body = jsonObject.getString("text");
+        id = jsonObject.getLong("id");
+        createdAt = jsonObject.getString("created_at");
+    }
 
     public User getUser() {
         return user;
     }
 
     public String getBody() {
-        return getString("text");
+        return body;
     }
 
-    public long getId() {
-        return getLong("id");
+    public String getCreatedAt() {
+        return createdAt;
     }
 
-    public boolean isFavorited() {
-        return getBoolean("favorited");
-    }
-
-    public boolean isRetweeted() {
-        return getBoolean("retweeted");
+    public long getTweetId() {
+        return id;
     }
 
     public String getDate() {
         String date;
         try {
-            String dateString = getString("created_at");
+            String dateString = createdAt;
 
             //I am clearly not doing this right, as I am turning the correct date into Jan 01, 2014.  Can't waste anymore time
             //blah, nevermind . . . I think I had capital HH which broke it
@@ -79,15 +88,13 @@ public class Tweet extends BaseModel {
     }
 
     public static Tweet fromJson(JSONObject jsonObject) {
-        Tweet tweet = new Tweet();
         try {
-            tweet.jsonObject = jsonObject;
-            tweet.user = User.fromJson(jsonObject.getJSONObject("user"));
+            Tweet tweet = new Tweet(jsonObject);
+            return tweet;
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
         }
-        return tweet;
     }
 
     public static ArrayList<Tweet> fromJson(JSONArray jsonArray) {
