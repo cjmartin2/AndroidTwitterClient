@@ -51,11 +51,18 @@ public class Tweet extends BaseModel {
             long timeNow = new Date().getTime();
             long diff = timeNow - timeAt;
 
+//            Log.d("time 1", String.valueOf(timeAt));
+//            Log.d("time 2", String.valueOf(timeNow));
+//            Log.d("time 3", String.valueOf(diff));
+
+            long diffSeconds = Math.max((diff / 1000), 1);
             long diffMinutes = Math.max((diff / (60 * 1000)), 1);
             long diffHours = Math.max((diff / (60 * 60 * 1000)), 1);
             long diffDays = Math.max((diff / (24 * 60 * 60 * 1000)), 1);
 
-            if(diffMinutes < 50){
+            if(diffSeconds < 50){
+                date = String.valueOf(diffSeconds) + "s";
+            }else if(diffMinutes < 50){
                 date = String.valueOf(diffMinutes) + "m";
             }else if(diffHours < 18) {
                 date = String.valueOf(diffHours) + "h";

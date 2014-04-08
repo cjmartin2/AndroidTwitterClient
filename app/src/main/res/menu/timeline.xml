@@ -16,7 +16,7 @@
         android:orderInCategory="1"
         android:icon="@drawable/ic_refresh"
         android:showAsAction="ifRoom"
-        android:onClick="onRefresh"
+        android:onClick="doRefresh"
         android:title="@string/refresh">
     </item>
 </menu>

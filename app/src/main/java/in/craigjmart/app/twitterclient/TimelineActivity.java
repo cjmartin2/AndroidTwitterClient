@@ -3,7 +3,6 @@ package in.craigjmart.app.twitterclient;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,12 +23,13 @@ import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 
-public class TimelineActivity extends Activity {
+public class TimelineActivity extends Activity implements OnRefreshListener {
     public static final String USER_ID = "user_id";
     private static final int COMPOSE_REQUEST = 123;
     private String user_id = "";
     private ListView lvTweets;
     private PullToRefreshLayout ptrLayout;
+    private TweetAdapter tweetAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +45,7 @@ public class TimelineActivity extends Activity {
         setupPullToRefresh();
 
         getProfile();
-        buildTimeline(-1, false);
+        buildTimeline(-1, -1);
 
         lvTweets.setOnScrollListener(new EndlessScrollListener() {
             @Override
@@ -55,74 +55,48 @@ public class TimelineActivity extends Activity {
         });
     }
 
-    private void buildTimeline(final long lastTweetId, final boolean isRefresh) {
-        CraigTwitterApp.getRestClient().getHomeTimeline(lastTweetId, new JsonHttpResponseHandler() {
+    private void buildTimeline(final long lastTweetId, final long since_id) {
+        CraigTwitterApp.getRestClient().getHomeTimeline(lastTweetId, since_id, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(JSONArray jsonTweets) {
 //                Log.d("DEBUG", jsonTweets.toString());
                 ArrayList<Tweet> tweets = Tweet.fromJson(jsonTweets);
 
-                TweetAdapter adapter = (TweetAdapter) lvTweets.getAdapter();
-                if (adapter == null) {
-                    adapter = new TweetAdapter(getBaseContext(), tweets);
-                    lvTweets.setAdapter(adapter);
+                tweetAdapter = (TweetAdapter) lvTweets.getAdapter();
+                if (tweetAdapter == null) {
+                    tweetAdapter = new TweetAdapter(getBaseContext(), tweets);
+                    lvTweets.setAdapter(tweetAdapter);
                 } else {
-                    if (isRefresh) {
-                        //find the id of the top tweet, and only append newer ones (I'm sure there is an API call designed for this)
-                        long topTweet = adapter.getItem(0).getId();
-                        long newTweet = 0;
-                        boolean invalidate = false;
+                    //since_id is -1 when we first build the timeline, otherwise we are trying to get the latest tweets
+                    if (since_id >= 0) {
                         for (int i = 0; i < tweets.size(); i++) {
-                            newTweet = tweets.get(i).getId();
-//                            Log.d("tweet", String.valueOf(newTweet));
-                            if (newTweet > topTweet) {
-                                //assuming the tweets are in order, coming from twitter, then we are putting
-                                //them in the same order at the top of the array adapter
-                                adapter.insert(tweets.get(i), i);
-                                invalidate = true;
-                            }
+                            //assuming the tweets are in order, coming from twitter, then we are putting
+                            //them in the same order at the top of the array adapter
+                            tweetAdapter.insert(tweets.get(i), i);
                         }
-                        if(invalidate) {
-                            //this does not seem to work, after refresh, user has to still scroll the view to get new update
-                            final TweetAdapter finalAdapter = adapter;
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    finalAdapter.notifyDataSetChanged();
-//                            adapter.notifyAll();
-//                            adapter.notify();
-                                }
-                            });
-                        }
+                        ptrLayout.setRefreshComplete();
                     } else {
-                        adapter.addAll(tweets);
+                        tweetAdapter.addAll(tweets);
                     }
                 }
             }
         });
     }
 
-    public void doRefresh() {
+    public void doRefresh(MenuItem menu) {
         //get fresh list of tweets
-        TweetAdapter adapter = (TweetAdapter)lvTweets.getAdapter();
-//        Log.d("tweet", String.valueOf(adapter.getItem(0).getId()));
-        buildTimeline(-1, true);
-    }
-
-    public void onRefresh(MenuItem miRefresh) {
-        doRefresh(); //
+        buildTimeline(-1, -1);
     }
 
     public void onRequestMore() {
         //need to subtract 1 here to get 2nd last, otherwise we get a dupe
-        buildTimeline(getLastTweetId() - 1, false);
+        buildTimeline(getLastTweetId() - 1, -1);
     }
 
     public long getLastTweetId() {
-        TweetAdapter adapter = (TweetAdapter)lvTweets.getAdapter();
         //this "-1" is just to account for 0-based array
-        return adapter.getItem(adapter.getCount()-1).getId();
+        return tweetAdapter.getItem(tweetAdapter.getCount()-1).getId();
     }
 
     public void onCompose(MenuItem miCompose){
@@ -142,9 +116,8 @@ public class TimelineActivity extends Activity {
             }
 
             Tweet tweet = Tweet.fromJson(jsonTweet);
-            TweetAdapter adapter = (TweetAdapter) lvTweets.getAdapter();
             //insert at beginning
-            adapter.insert(tweet, 0);
+            tweetAdapter.insert(tweet, 0);
         }
     }
 
@@ -181,34 +154,15 @@ public class TimelineActivity extends Activity {
             // Mark All Children as pullable
             .allChildrenArePullable()
                     // Set a OnRefreshListener
-            .listener(new OnRefreshListener() {
-                @Override
-                public void onRefreshStarted(View view) {
-                    new AsyncTask<Void, Void, Void>() {
-
-                        @Override
-                        protected Void doInBackground(Void... params) {
-                            try {
-                                //this is honestly just so there is some animation so the user isn't confused
-                                Thread.sleep(500);
-                                doRefresh();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            return null;
-                        }
-
-                        @Override
-                        protected void onPostExecute(Void result) {
-                            super.onPostExecute(result);
-
-                            // Notify PullToRefreshLayout that the refresh has finished
-                            ptrLayout.setRefreshComplete();
-                        }
-                    }.execute();
-                }
-            })
+            .listener(this)
                     // Finally commit the setup to our PullToRefreshLayout
             .setup(ptrLayout);
+    }
+
+    @Override
+    public void onRefreshStarted(View view) {
+        //get newest tweets
+        long topTweet = tweetAdapter.getItem(0).getId();
+        buildTimeline(-1, topTweet);
     }
 }
