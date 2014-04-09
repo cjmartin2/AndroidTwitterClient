@@ -1,11 +1,10 @@
 package in.craigjmart.app.twitterclient.models;
 
-import com.activeandroid.Model;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,14 +14,13 @@ import java.util.Locale;
 /**
  * Created by admin on 4/1/14.
  */
-public class Tweet extends Model {
+public class Tweet implements Serializable {
     private User user;
     private String body;
     private long id;
     private String createdAt;
 
     public Tweet(JSONObject jsonObject) throws JSONException {
-        super();
         user = User.fromJson(jsonObject.getJSONObject("user"));
         body = jsonObject.getString("text");
         id = jsonObject.getLong("id");

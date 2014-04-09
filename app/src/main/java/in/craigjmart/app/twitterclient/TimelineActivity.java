@@ -3,6 +3,7 @@ package in.craigjmart.app.twitterclient;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
@@ -22,7 +23,8 @@ public class TimelineActivity extends FragmentActivity implements ActionBar.TabL
     public static final String USER_ID = "user_id";
     private static final int COMPOSE_REQUEST = 123;
     private String user_id = "";
-    private TweetAdapter tweetAdapter;
+    private HomeTimelineFragment htlf;
+    private MentionsFragment mtlf;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +43,14 @@ public class TimelineActivity extends FragmentActivity implements ActionBar.TabL
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayShowTitleEnabled(true);
         //apparently this doesn't work - need to create custom style
-//        actionBar.setBackgroundDrawable(new ColorDrawable(0x6999FA));
+        actionBar.setBackgroundDrawable(new ColorDrawable(0xFF6999FA));
+        actionBar.setStackedBackgroundDrawable(new ColorDrawable(0xCC6999FA));
 
         ActionBar.Tab tabHome = actionBar.newTab().setText("Home").setTag("HomeTimelineFragment")
                 .setIcon(R.drawable.ic_home).setTabListener(this);
 
         ActionBar.Tab tabMentions = actionBar.newTab().setText("Mentions").setTag("MentionsTimelineFragment")
-                .setIcon(R.drawable.ic_home).setTabListener(this);
+                .setIcon(R.drawable.ic_mentions).setTabListener(this);
 
         actionBar.addTab(tabHome);
         actionBar.addTab(tabMentions);
@@ -59,18 +62,18 @@ public class TimelineActivity extends FragmentActivity implements ActionBar.TabL
         startActivityForResult(i, COMPOSE_REQUEST);
     }
 
+    public void onProfileView(MenuItem miProfile) {
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent i) {
         if (resultCode == RESULT_OK  && requestCode == COMPOSE_REQUEST) {
-            JSONObject jsonTweet;
-            try {
-                jsonTweet = new JSONObject(i.getExtras().getString("jsonTweet"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-                return;
-            }
+            Tweet tweet = (Tweet) i.getExtras().getSerializable("tweet");
 
-            Tweet tweet = Tweet.fromJson(jsonTweet);
+            //get the appropriate adapter from our home timeline fragment
+            TweetAdapter tweetAdapter = htlf.getTweetAdapter();
+
             //insert at beginning
             tweetAdapter.insert(tweet, 0);
         }
@@ -108,10 +111,16 @@ public class TimelineActivity extends FragmentActivity implements ActionBar.TabL
         android.support.v4.app.FragmentTransaction fts = getSupportFragmentManager().beginTransaction();
         if(tab.getTag() == "HomeTimelineFragment"){
             // set fragment to home
-                fts.replace(R.id.frame_container, new HomeTimelineFragment());
+                if(htlf == null){
+                    htlf = new HomeTimelineFragment();
+                }
+                fts.replace(R.id.frame_container, htlf);
         }else{
             //set fragment to mentions
-            fts.replace(R.id.frame_container, new MentionsFragment());
+            if(mtlf == null){
+                mtlf = new MentionsFragment();
+            }
+            fts.replace(R.id.frame_container, mtlf);
         }
         fts.commit();
     }

@@ -16,6 +16,7 @@
         android:orderInCategory="10"
         android:icon="@drawable/ic_profile"
         android:showAsAction="ifRoom"
+        android:onClick="onProfileView"
         android:title="@string/profile">
     </item>
 </menu>

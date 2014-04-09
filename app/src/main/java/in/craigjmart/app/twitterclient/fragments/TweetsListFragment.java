@@ -60,11 +60,8 @@ public abstract class TweetsListFragment extends Fragment implements OnRefreshLi
         ptrLayout = (PullToRefreshLayout) view.findViewById(R.id.ptrLayout);
         lvTweets = (ListView) view.findViewById(R.id.lvTweets);
 
-        tweetAdapter = (TweetAdapter) lvTweets.getAdapter();
-        if (tweetAdapter == null) {
-            tweetAdapter = new TweetAdapter(getActivity(), new ArrayList<Tweet>());
-            lvTweets.setAdapter(tweetAdapter);
-        }
+        tweetAdapter = new TweetAdapter(getActivity(), new ArrayList<Tweet>());
+        lvTweets.setAdapter(tweetAdapter);
 
         // Now setup the PullToRefreshLayout
         setupPullToRefresh();

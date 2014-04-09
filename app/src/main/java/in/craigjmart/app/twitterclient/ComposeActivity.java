@@ -13,6 +13,8 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONObject;
 
+import in.craigjmart.app.twitterclient.models.Tweet;
+
 
 public class ComposeActivity extends Activity {
     private EditText etTweet;
@@ -31,13 +33,17 @@ public class ComposeActivity extends Activity {
 
     public void onTweet(View v) {
         String tweetText = etTweet.getText().toString();
-
         CraigTwitterApp.getRestClient().postTweet(tweetText,
                 new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(JSONObject jsonTweet) {
+                        Tweet tweet = Tweet.fromJson(jsonTweet);
                         Intent i = new Intent();
-                        i.putExtra("jsonTweet", jsonTweet.toString());
+
+                        //need serializable bundle for dealing with fragments
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("tweet", tweet);
+                        i.putExtras(bundle);
                         setResult(RESULT_OK, i);
                         finish();
 //                        Log.d("DEBUG", jsonTweet.toString());
