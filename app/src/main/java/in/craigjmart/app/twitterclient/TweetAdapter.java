@@ -1,6 +1,7 @@
 package in.craigjmart.app.twitterclient;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import java.util.List;
 
 import in.craigjmart.app.twitterclient.models.Tweet;
+import in.craigjmart.app.twitterclient.models.User;
 
 /**
  * Created by admin on 4/1/14.
@@ -31,14 +33,24 @@ public class TweetAdapter extends ArrayAdapter<Tweet>{
             view = inflater.inflate(R.layout.item_tweet, null);
         }
 
-        Tweet tweet = getItem(position);
+        final Tweet tweet = getItem(position);
 
+        final User u = tweet.getUser();
         ImageView imageView = (ImageView) view.findViewById(R.id.ivProfile);
-        ImageLoader.getInstance().displayImage(tweet.getUser().getProfileImageUrl(), imageView);
+        ImageLoader.getInstance().displayImage(u.getProfileImageUrl(), imageView);
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getContext(), ProfileActivity.class);
+                i.putExtra("user", u);
+                getContext().startActivity(i);
+            }
+        });
 
         TextView nameView = (TextView) view.findViewById(R.id.tvName);
-        String formattedName = "<b>" + tweet.getUser().getName() + " </b><small><font color='#777777'>@"+
-                tweet.getUser().getScreenName() + "</font><small>";
+        String formattedName = "<b>" + u.getName() + " </b><small><font color='#777777'>@"+
+                u.getScreenName() + "</font><small>";
         nameView.setText(Html.fromHtml(formattedName));
 
         TextView dateView = (TextView) view.findViewById(R.id.tvDate);

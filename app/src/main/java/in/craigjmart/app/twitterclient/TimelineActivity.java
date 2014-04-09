@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import in.craigjmart.app.twitterclient.fragments.HomeTimelineFragment;
 import in.craigjmart.app.twitterclient.fragments.MentionsFragment;
 import in.craigjmart.app.twitterclient.models.Tweet;
+import in.craigjmart.app.twitterclient.models.User;
 
 
 public class TimelineActivity extends FragmentActivity implements ActionBar.TabListener {
@@ -25,6 +26,7 @@ public class TimelineActivity extends FragmentActivity implements ActionBar.TabL
     private String user_id = "";
     private HomeTimelineFragment htlf;
     private MentionsFragment mtlf;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +65,9 @@ public class TimelineActivity extends FragmentActivity implements ActionBar.TabL
     }
 
     public void onProfileView(MenuItem miProfile) {
-
+        Intent i = new Intent(this, ProfileActivity.class);
+        i.putExtra("user", user);
+        startActivity(i);
     }
 
     @Override
@@ -81,12 +85,13 @@ public class TimelineActivity extends FragmentActivity implements ActionBar.TabL
 
     private void getProfile() {
         //currently have no plans to use this, was just doing it to help in the group chat
-        CraigTwitterApp.getRestClient().getProfile(user_id, new JsonHttpResponseHandler() {
+        CraigTwitterApp.getRestClient().getUsersInfo(user_id, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(JSONObject jsonUser) {
                 try {
+                    user = User.fromJson(jsonUser);
 //                    Log.d("DIGGING", jsonUser.toString());
-                    String screen_name = (String) jsonUser.get("screen_name");
+                    String screen_name = user.getScreenName();
 //                    Log.d("DIGGING", screen_name);
 //                    Log.d("DIGGING", (String)jsonUser.get("profile_image_url"));
                     ActionBar ab = getActionBar();

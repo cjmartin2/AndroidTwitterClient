@@ -42,16 +42,26 @@ public class TwitterClient extends OAuthBaseClient {
             params.put("since_id", String.valueOf(since_id));
         }
         if (lastTweetId != -1) {
-            params.put("max_id", Long.toString(lastTweetId-1));
+            params.put("max_id", Long.toString(lastTweetId - 1));
         }
         getClient().get(apiUrl, params, handler);
     }
 
-    public void getProfile(String user_id, AsyncHttpResponseHandler handler){
+    public void getUsersInfo(String user_id, AsyncHttpResponseHandler handler){
         String apiUrl = getApiUrl("users/show.json");
         RequestParams params = new RequestParams();
         params.put("user_id", user_id);
         getClient().get(apiUrl, params, handler);
+    }
+
+    public void getUserTimeline(long user_id, long lastTweetId, AsyncHttpResponseHandler handler) {
+        String url = getApiUrl("statuses/user_timeline.json");
+        RequestParams params = new RequestParams();
+        params.put("user_id", String.valueOf(user_id));
+        if (lastTweetId != -1) {
+            params.put("max_id", Long.toString(lastTweetId - 1));
+        }
+        client.get(url, params, handler);
     }
 
     public void postTweet(String body, AsyncHttpResponseHandler handler) {

@@ -34,9 +34,9 @@ public abstract class TweetsListFragment extends Fragment implements OnRefreshLi
     private OnFragmentInteractionListener mListener;
     protected PullToRefreshLayout ptrLayout;
     protected TweetAdapter tweetAdapter;
-    private ListView lvTweets;
-    private static final int NO_SINCE_ID = -1;
-    private static final int NO_LAST_TWEET_ID = -1;
+    protected ListView lvTweets;
+    protected static final int NO_SINCE_ID = -1;
+    protected static final int NO_LAST_TWEET_ID = -1;
 
     public TweetsListFragment() {
         // Required empty public constructor

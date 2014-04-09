@@ -15,8 +15,8 @@
         android:name="in.craigjmart.app.twitterclient.CraigTwitterApp"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:logo="@drawable/ic_twitter"
         android:label="@string/app_name"
+        android:logo="@drawable/ic_twitter"
         android:theme="@style/AppTheme" >
         <meta-data
             android:name="AA_DB_NAME"
@@ -49,9 +49,17 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name=".ComposeActivity"
+            android:name="in.craigjmart.app.twitterclient.ComposeActivity"
             android:label="@string/compose_tweet"
-            android:parentActivityName=".TimelineActivity" >
+            android:parentActivityName="in.craigjmart.app.twitterclient.TimelineActivity" >
+        </activity>
+        <activity
+            android:name="in.craigjmart.app.twitterclient.ProfileActivity"
+            android:label="@string/title_activity_profile"
+            android:parentActivityName="in.craigjmart.app.twitterclient.TimelineActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="TimelineActivity" />
         </activity>
     </application>
 

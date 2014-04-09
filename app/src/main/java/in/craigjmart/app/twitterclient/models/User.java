@@ -15,6 +15,8 @@ public class User implements Serializable  {
     private int statusesCount;
     private int followersCount;
     private int friendsCount;
+    private String description;
+    private long userId;
 
     public int getStatusesCount() {
         return statusesCount;
@@ -44,17 +46,27 @@ public class User implements Serializable  {
         try {
             User u = new User();
 
+            u.userId = jsonObject.getLong("id");
             u.name = jsonObject.getString("name");
             u.screenName = jsonObject.getString("screen_name");
             u.profileImageUrl = jsonObject.getString("profile_image_url");
             u.statusesCount = jsonObject.getInt("statuses_count");
             u.followersCount = jsonObject.getInt("followers_count");
             u.friendsCount = jsonObject.getInt("friends_count");
+            u.description = jsonObject.getString("description");
 
             return u;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public String getTagline() {
+        return description;
+    }
+
+    public long getUserId() {
+        return userId;
     }
 }
