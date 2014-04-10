@@ -1,6 +1,7 @@
 package in.craigjmart.app.twitterclient;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -24,6 +25,8 @@ import org.scribe.builder.api.TwitterApi;
 public class TwitterClient extends OAuthBaseClient {
     public static final Class<? extends Api> REST_API_CLASS = TwitterApi.class; // Change this
     public static final String REST_URL = "https://api.twitter.com/1.1"; // Change this, base API URL
+
+    //** KEYS REGENERATED!! **
     public static final String REST_CONSUMER_KEY = "CuYbHZ9zGZvPobDo27ivarGl0";       // Change this
     public static final String REST_CONSUMER_SECRET = "Sph7DJlPCl3g9b2x04xBOPCEg87MyYiZT3O8q3J6YO5rSEhSmW"; // Change this
     public static final String REST_CALLBACK_URL = "oauth://craigtwitter"; // Change this (here and in manifest)
@@ -35,6 +38,10 @@ public class TwitterClient extends OAuthBaseClient {
     // CHANGE THIS
     // DEFINE METHODS for different API endpoints here
     public void getHomeTimeline(long lastTweetId, long since_id, AsyncHttpResponseHandler handler) {
+        //** KEYS REGENERATED!! **
+        Log.d("OMG STUFF IS BROKE", "REGERATED TWITTER API KEYS!!!!");
+
+
         String apiUrl = getApiUrl("statuses/home_timeline.json");
         RequestParams params = new RequestParams();
         params.put("count", "25");
